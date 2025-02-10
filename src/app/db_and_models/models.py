@@ -14,7 +14,7 @@ class UserModel(SQLModel):
 
 
 # database table for users, extends the base model and makes it a table
-class UserTable(UserModel, table=True):
+class User(UserModel, table=True):
     __tablename__ = "users"  # explicit table name
 
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -23,7 +23,7 @@ class UserTable(UserModel, table=True):
     # - this creates a one-to-many relationship (one user → many posts)
     # - sqlmodel will not create a column for this, it is only used for accessing related posts
     # - back_populates="author" means it connects to the "author" attribute in PostTable
-    posts: list["PostTable"] = Relationship(back_populates="author")
+    posts: list["Post"] = Relationship(back_populates="author")
 
 
 # base model for post data, used for validation and data transfer
@@ -35,7 +35,7 @@ class PostModel(SQLModel):
 
 
 # database table for posts, extends PostModel and makes it a table
-class PostTable(PostModel, table=True):
+class Post(PostModel, table=True):
     __tablename__ = "posts"
 
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -48,4 +48,4 @@ class PostTable(PostModel, table=True):
     # relationship back to the user who created the post
     # - this creates the "many-to-one" side of the relationship (many posts → one user)
     # - back_populates="posts" links back to the "posts" attribute in UserTable
-    author: Optional[UserTable] = Relationship(back_populates="posts")
+    author: Optional[User] = Relationship(back_populates="posts")
