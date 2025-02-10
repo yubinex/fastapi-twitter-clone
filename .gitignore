@@ -1,5 +1,13 @@
+# ignore Python cache files
 __pycache__/
 *.pyc
 *.pyo
-.env
+
+# ignore virtual environments
 .venv/
+
+# ignore environment variables (secrets, API keys, etc.)
+.env
+
+# ignore build artifacts
+*.egg-info/
