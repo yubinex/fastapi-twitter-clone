@@ -7,7 +7,7 @@ name = "twitter"
 description = "My FastAPI app"
 version = "0.0.1"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.12"
 keywords = ["FastAPI"]
 license = { text = "MIT" }
 classifiers = [
