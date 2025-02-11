@@ -2,6 +2,7 @@ from fastapi import HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session, select
 
+from app.auth.auth import create_access_token, get_password_hash, verify_password
 from app.db_and_models.models import User, UserModel
 
 
@@ -10,7 +11,7 @@ async def create_user(user_model: UserModel, db: Session):
     if existing_user:
         raise HTTPException(status_code=400, detail="email already in use")
 
-    # TODO: hash password
+    user_model.password = get_password_hash(user_model.password)
 
     user = User.model_validate(user_model)
     db.add(user)
@@ -26,6 +27,10 @@ async def login_user(form_data: OAuth2PasswordRequestForm, db: Session):
     if not existing_user:
         raise HTTPException(status_code=401, detail="authentification failed")
 
-    # TODO: validate password
+    if not verify_password(
+        plain_password=form_data.password, hashed_password=existing_user.password
+    ):
+        raise HTTPException(status_code=401, detail="authentification failed")
+    token = create_access_token(user=existing_user)
 
-    return {"access_token": "fake_token", "token_type": "bearer"}
+    return {"access_token": token, "token_type": "bearer"}
