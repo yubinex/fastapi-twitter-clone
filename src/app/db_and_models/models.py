@@ -32,6 +32,7 @@ class PostModel(SQLModel):
 
     # defaults to current time
     created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: datetime = Field(default_factory=datetime.now)
 
 
 # database table for posts, extends PostModel and makes it a table
