@@ -31,3 +31,19 @@ async def delete_post(post_id: int, db: Session, user_id: int):
     db.delete(post)
     db.commit()
     return {"success": f"post with id {post_id} deleted"}
+
+
+async def update_post(post_id: int, post_model: PostModel, db: Session, user_id: int):
+    post = db.exec(select(Post).where(Post.id == post_id)).first()
+    if not post:
+        raise HTTPException(status_code=404, detail="post not found")
+    if post.user_id != user_id:
+        raise HTTPException(
+            status_code=401,
+            detail="unauthorized: you can only update posts that you created",
+        )
+    post.updated_at, post.content = post_model.created_at, post_model.content
+    db.add(post)
+    db.commit()
+    db.refresh(post)
+    return {"success": f"post with id {post.id} updated"}
