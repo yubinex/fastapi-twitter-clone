@@ -17,7 +17,7 @@ async def create_like(like_model: LikeModel, db: Session, user_id: int):
     if not existing_post:
         raise HTTPException(
             status_code=404,
-            detail=f"could not fund post with id: {like_model.post_id}",
+            detail=f"could not find post with id: {like_model.post_id}",
         )
     # check if post is already liked
     existing_like = db.exec(
