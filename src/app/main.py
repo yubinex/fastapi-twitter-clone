@@ -13,7 +13,7 @@ async def lifespan(app: FastAPI):
     create_db_and_tables()
     yield
     # delete DB automatically (for better dev experience)
-    # drop_tables()
+    drop_tables()
 
 
 app = FastAPI(lifespan=lifespan)

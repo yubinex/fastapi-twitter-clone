@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlmodel import Session
 
 from app.auth.auth import get_current_user
-from app.crud.likes import create_like
+from app.crud.likes import create_like, delete_like
 from app.db_and_models.models import LikeModel, User
 from app.db_and_models.session import get_session
 
@@ -16,3 +16,12 @@ async def create_like_endpoint(
     current_user: User = Depends(get_current_user),
 ):
     return await create_like(like_model=like_model, db=db, user_id=current_user.id)
+
+
+@router.delete("/likes/{like_id}")
+async def delete_like_endpoint(
+    like_id: int,
+    db: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+):
+    return await delete_like(like_id=like_id, db=db, user_id=current_user.id)
