@@ -24,6 +24,7 @@ class User(UserModel, table=True):
     # - sqlmodel will not create a column for this, it is only used for accessing related posts
     # - back_populates="author" means it connects to the "author" attribute in PostTable
     posts: list["Post"] = Relationship(back_populates="author")
+    likes: list["Like"] = Relationship(back_populates="user")
 
 
 # base model for post data, used for validation and data transfer
@@ -50,3 +51,18 @@ class Post(PostModel, table=True):
     # - this creates the "many-to-one" side of the relationship (many posts → one user)
     # - back_populates="posts" links back to the "posts" attribute in UserTable
     author: Optional[User] = Relationship(back_populates="posts")
+    likes: list["Like"] = Relationship(back_populates="post")
+
+
+class LikeModel(SQLModel):
+    post_id: Optional[int] = Field(default=None, foreign_key="posts.id")
+
+
+class Like(LikeModel, table=True):
+    __tablename__ = "likes"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: Optional[int] = Field(default=None, foreign_key="users.id")
+
+    user: Optional[User] = Relationship(back_populates="likes")
+    post: Optional[Post] = Relationship(back_populates="likes")
