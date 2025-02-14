@@ -52,3 +52,14 @@ async def delete_like(like_id: int, db: Session, user_id: int):
     db.delete(existing_like)
     db.commit()
     return {"success": "like removed"}
+
+
+async def get_likes_of_post(post_id: int, db: Session):
+    existing_post = db.exec(select(Post).where(Post.id == post_id)).first()
+    if not existing_post:
+        raise HTTPException(
+            status_code=404,
+            detail="post not found",
+        )
+    likes = db.exec(select(Like).where(Like.post_id == post_id)).all()
+    return likes
