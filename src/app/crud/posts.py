@@ -47,3 +47,18 @@ async def update_post(post_id: int, post_model: PostModel, db: Session, user_id:
     db.commit()
     db.refresh(post)
     return {"success": f"post with id {post.id} updated"}
+
+
+async def get_post(post_id: int, db: Session):
+    post = db.exec(select(Post).where(Post.id == post_id)).first()
+    if not post:
+        raise HTTPException(
+            status_code=404,
+            detail="post not found",
+        )
+    return post
+
+
+async def get_all_posts_by_user_id(user_id: int, db: Session):
+    posts = db.exec(select(Post).where(Post.user_id == user_id)).all()
+    return posts
