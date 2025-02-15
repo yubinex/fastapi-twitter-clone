@@ -35,4 +35,29 @@ async def create_follower(follower_model: FollowerModel, db: Session, user_id: i
     db.add(follower)
     db.commit()
     db.refresh(follower)
-    return {"success": f"user with id: {user_id} now follows {follower.follower_id}"}
+    return {
+        "success": f"user with id: {user_id} now follows user with id: {follower.follower_id}"
+    }
+
+
+async def delete_follower(follower_id: int, db: Session, user_id: int):
+    follow = db.exec(
+        select(Follower)
+        .where(Follower.user_id == user_id)
+        .where(Follower.follower_id == follower_id)
+    ).first()
+    if not follow:
+        raise HTTPException(
+            status_code=404,
+            detail="could not find this following status",
+        )
+    if follow.user_id != user_id:
+        raise HTTPException(
+            status_code=401,
+            detail="not authorized",
+        )
+    db.delete(follow)
+    db.commit()
+    return {
+        "success": f"user with id: {user_id} is no longer following user with id: {follower_id}"
+    }
