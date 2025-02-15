@@ -5,6 +5,21 @@ from pydantic import EmailStr
 from sqlmodel import Field, Relationship, SQLModel
 
 
+class UserFollowerLink(SQLModel, table=True):
+    __tablename__ = "user_follower_link"
+
+    # composite primary key consisting of `user_id` and `follower_id`
+    # - `user_id` references `users.id` (the user being followed)
+    # - `follower_id` references f`ollowers.id` (the user who is following)
+    # - together they form the many-to-many relationship between users and followers
+    user_id: Optional[int] = Field(
+        default=None, foreign_key="users.id", primary_key=True
+    )
+    follower_id: Optional[int] = Field(
+        default=None, foreign_key="followers.id", primary_key=True
+    )
+
+
 # base model for user data, used for data validation and transfer
 class UserModel(SQLModel):
     username: str
@@ -25,6 +40,15 @@ class User(UserModel, table=True):
     # - back_populates="author" means it connects to the "author" attribute in PostTable
     posts: list["Post"] = Relationship(back_populates="author")
     likes: list["Like"] = Relationship(back_populates="user")
+
+    # relationship to followers through the association table
+    # - creates a many-to-many relationship between users and followers
+    # - link_model=UserFollowerLink specifies the junction table
+    # - back_populates connects to "followed_users" in Follower
+    # - allows accessing `user.followers` to get all their followers
+    followers: list["Follower"] = Relationship(
+        back_populates="followed_users", link_model=UserFollowerLink
+    )
 
 
 # base model for post data, used for validation and data transfer
@@ -66,3 +90,23 @@ class Like(LikeModel, table=True):
 
     user: Optional[User] = Relationship(back_populates="likes")
     post: Optional[Post] = Relationship(back_populates="likes")
+
+
+class FollowerModel(SQLModel):
+    follower_id: int
+
+
+class Follower(FollowerModel, table=True):
+    __tablename__ = "followers"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int
+
+    # relationship back to users through the association table
+    # - relative side of the many-to-many relationship
+    # - link_model=UserFollowerLink connects using the same junction table
+    # - back_populates connects to "followers" in user
+    # - allows accessing `follower.followed_users` to get all followed accounts
+    followed_users: list[User] = Relationship(
+        back_populates="followers", link_model=UserFollowerLink
+    )
