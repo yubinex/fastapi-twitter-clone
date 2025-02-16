@@ -14,7 +14,7 @@ async def create_follower(follower_model: FollowerModel, db: Session, user_id: i
     if user_id == follower_model.follower_id:
         raise HTTPException(
             status_code=400,
-            details="users cannot follow themselves",
+            detail="users cannot follow themselves",
         )
     followed_user = db.exec(
         select(User).where(User.id == follower_model.follower_id)
