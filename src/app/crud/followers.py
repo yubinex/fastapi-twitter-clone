@@ -66,3 +66,13 @@ async def delete_follower(follower_id: int, db: Session, user_id: int):
     return {
         "success": f"user with id: {user_id} is no longer following user with id: {follower_id}"
     }
+
+
+async def get_followers(user_id: int, db: Session):
+    followers = db.exec(select(Follower).where(Follower.follower_id == user_id)).all()
+    return followers
+
+
+async def get_following(user_id: int, db: Session):
+    following = db.exec(select(Follower).where(Follower.user_id == user_id)).all()
+    return following
